@@ -2,49 +2,42 @@ pipeline {
   agent any
 
   environment {
-    IMAGE_NAME = "nh360-services"
-    CONTAINER_NAME = "nh360-services"
-    DOMAIN_NAME = "services.nh360fastag.com"
+    DOMAIN = "services"
+    BASE_DOMAIN = "nh360fastag.com"
+    CONTAINER_NAME = "services"
   }
 
   stages {
-    stage('Clone Repo') {
+    stage('Checkout Code') {
       steps {
-        git branch: 'main', url: 'https://github.com/talonmindhq/nh360.git'
+        git 'https://github.com/talonmindhq/nh360.git'
       }
     }
 
-    stage('Build Docker Image') {
+    stage('Deploy Service') {
       steps {
         script {
-          dockerImage = docker.build("${IMAGE_NAME}:latest")
+          sh '''
+            echo "🌀 Pulling latest code"
+            git pull origin main || true
+
+            echo "🔻 Stopping old containers"
+            docker compose down || true
+
+            echo "🚀 Rebuilding and starting updated containers"
+            docker compose up -d --build
+          '''
         }
       }
     }
+  }
 
-    stage('Stop Old Container') {
-      steps {
-        sh """
-          docker stop ${CONTAINER_NAME} || true
-          docker rm ${CONTAINER_NAME} || true
-        """
-      }
+  post {
+    success {
+      echo "✅ Deployed successfully at https://${DOMAIN}.${BASE_DOMAIN}"
     }
-
-    stage('Run New Container (Traefik)') {
-      steps {
-        sh """
-          docker run -d \
-            --name ${CONTAINER_NAME} \
-            --network traefik \
-            -v /var/run/docker.sock:/var/run/docker.sock \
-            -l "traefik.enable=true" \
-            -l "traefik.http.routers.${CONTAINER_NAME}.rule=Host(\`${DOMAIN_NAME}\`)" \
-            -l "traefik.http.routers.${CONTAINER_NAME}.entrypoints=websecure" \
-            -l "traefik.http.routers.${CONTAINER_NAME}.tls.certresolver=letsencrypt" \
-            ${IMAGE_NAME}:latest
-        """
-      }
+    failure {
+      echo "❌ Deployment failed!"
     }
   }
 }
