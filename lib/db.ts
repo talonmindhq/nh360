@@ -13,3 +13,10 @@ export const pool = mysql.createPool({
   queueLimit: 0,
 });
 
+// Example: Parameterized query (prevents SQL injection)
+export async function getUserByEmail(email: string) {
+  const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+  // Never log sensitive data in production
+  return rows;
+}
+

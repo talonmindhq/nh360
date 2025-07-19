@@ -20,7 +20,22 @@ export function middleware(req: NextRequest) {
         { status: 401, headers: { 'Content-Type': 'application/json' } }
       )
     }
-    // Optionally, you can add more checks here (e.g., role-based API access)
+    // Role-based API access (example: /api/admin/* requires userType: 'admin')
+    try {
+      const data = JSON.parse(session)
+      if (url.pathname.startsWith('/api/admin') && data.userType !== 'admin') {
+        return new NextResponse(
+          JSON.stringify({ error: 'Forbidden' }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+      // Add more role checks as needed
+    } catch {
+      return new NextResponse(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
     return NextResponse.next()
   }
 

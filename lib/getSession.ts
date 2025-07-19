@@ -1,4 +1,5 @@
 // lib/getSession.ts
+// NOTE: Never trust client-side session data for authorization. Always validate on the server.
 import { cookies } from 'next/headers'
 
 export function getUserSession() {

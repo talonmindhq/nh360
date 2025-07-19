@@ -1,59 +1,13 @@
 "use server"
 
 import { cookies } from "next/headers"
+import bcrypt from 'bcryptjs'
 
-// Mock agent data
-const mockAgents = [
-  {
-    id: "agent-1",
-    email: "agent@example.com",
-    password: "password123", // In a real app, this would be hashed
-    name: "John Doe",
-    phone: "9876543210",
-    address: "123 Agent Street, Delhi",
-    status: "Active",
-    commissionRate: 10,
-  },
-]
+// Replace mock data with real DB lookup in production
+// Example: const user = await db.getUserByEmail(email)
+// For now, throw error to force implementation
+throw new Error('Implement real user lookup and password check with bcrypt for production')
 
-// Mock admin data
-const mockAdmins = [
-  {
-    id: "admin-1",
-    email: "admin@nh360fastag.com",
-    password: "admin123", // In a real app, this would be hashed
-    name: "Admin User",
-    role: "Super Admin",
-  },
-]
-
-// Mock employee data
-const mockEmployees = [
-  {
-    id: "emp-1",
-    email: "employee@nh360fastag.com",
-    password: "employee123", // In a real app, this would be hashed
-    name: "Employee User",
-    phone: "8765432109",
-    role: "Sales Executive",
-    status: "Active",
-  },
-]
-
-// Mock user data
-const mockUsers = [
-  {
-    id: "user-1",
-    email: "user@example.com",
-    password: "user123", // In a real app, this would be hashed
-    name: "Regular User",
-    phone: "7654321098",
-    vehicleNumber: "DL01AB1234",
-    status: "Active",
-  },
-]
-
-// Unified login function
 export async function loginUser(email: string, password: string) {
   // Simulate a delay for API call
   await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -68,6 +22,7 @@ export async function loginUser(email: string, password: string) {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: "/",
       },
@@ -85,6 +40,7 @@ export async function loginUser(email: string, password: string) {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: "/",
       },
@@ -108,6 +64,7 @@ export async function loginUser(email: string, password: string) {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: "/",
       },
@@ -131,6 +88,7 @@ export async function loginUser(email: string, password: string) {
       {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
+        sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 1 week
         path: "/",
       },
