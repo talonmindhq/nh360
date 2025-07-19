@@ -10,6 +10,20 @@ export function middleware(req: NextRequest) {
   // Check if path starts with a protected prefix
   const isProtected = protectedPrefixes.some(prefix => url.pathname.startsWith(prefix))
 
+  // Check if path is an API route
+  const isApi = url.pathname.startsWith('/api')
+
+  if (isApi) {
+    if (!session) {
+      return new NextResponse(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+    // Optionally, you can add more checks here (e.g., role-based API access)
+    return NextResponse.next()
+  }
+
   if (isProtected) {
     if (!session) {
       url.pathname = '/login'
@@ -37,12 +51,13 @@ export function middleware(req: NextRequest) {
   return NextResponse.next()
 }
 
-// Protect *all* pages under role paths, not just dashboard
+// Protect *all* pages under role paths, not just dashboard, and all API routes
 export const config = {
   matcher: [
     '/admin/:path*',
     '/agent/:path*',
     '/employee/:path*',
     '/user/:path*',
+    '/api/:path*',
   ]
 }
